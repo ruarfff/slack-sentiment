@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 jupyter = "*"
 slack-sdk = "*"
+nltk = "*"
+numpy = "*"
+pandas = "*"
+matplotlib = "*"
 
 [dev-packages]
 
