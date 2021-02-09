@@ -1,17 +1,8 @@
 from flask import Flask
 from flask import request
 import pickle
-import nltk
 from nltk import download
-from nltk.tokenize import word_tokenize, sent_tokenize
-import itertools
-
-
-app = Flask(__name__)
-
-model_file = open('sentiment_classifier.pickle', 'rb')
-model = pickle.load(model_file)
-model_file.close()
+from nltk.tokenize import word_tokenize
 
 download('stopwords')
 download('names')
@@ -19,6 +10,10 @@ download('punkt')
 
 from nltk.corpus import stopwords, names
 from string import punctuation
+
+model_file = open('sentiment_classifier.pickle', 'rb')
+model = pickle.load(model_file)
+model_file.close()
 
 name_words = set([n.lower() for n in names.words()])
 stop_words = set(stopwords.words("english"))
@@ -32,15 +27,13 @@ def word_counts(words):
         counts[word] = counts.get(word, 0) + 1
     return counts
 
+app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def classify_text():
     if request.method == 'POST':
         text = request.form.get('text')
-        tokenized_text = [sent_tokenize(t) for t in text]
-        sentences = list(itertools.chain(*tokenized_text))
-        tokenized_words = [word_tokenize(sentence) for sentence in sentences]
-        words = clean_words(list(itertools.chain(*tokenized_words)))
+        words = clean_words(word_tokenize(text))
 
         res = model.classify(word_counts(words))
 
